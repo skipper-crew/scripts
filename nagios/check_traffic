@@ -1,0 +1,42 @@
+#!/bin/sh
+
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
+STATE_DEPENDENT=4
+exitstatus=$STATE_OK
+mbit="Mbit/s"
+kbit="kbit/s"
+
+/usr/local/bin/vnstat -i bce1 -tr > /usr/local/libexec/nagios/check_traffic.log
+stats=`cat /usr/local/libexec/nagios/check_traffic.log | grep bit`
+in=`echo $stats | awk '{print $2}'`
+out=`echo $stats | awk '{print $7}'`
+in_bit=`echo $stats | awk '{print $3}'`
+out_bit=`echo $stats | awk '{print $8}'`
+echo $stats
+echo $in
+echo $out
+
+if [ $in_bit = $mbit ]; then
+    in=`echo $stats | awk '{print $2}' | awk -F . '{print $1}'`
+    in=`expr $in \* 1048576`
+fi
+
+if [ $out_bit = $mbit ]; then
+    out=`echo $stats | awk '{print $7}' | awk -F . '{print $1}'`
+    out=`expr $out \* 1048576`
+fi
+
+if [ $in_bit = $kbit ]; then
+    in=`echo $stats | awk '{print $2}' | awk -F . '{print $1}'`
+    in=`expr $in \* 1024`
+fi
+
+if [ $out_bit = $kbit ]; then
+    out=`echo $stats | awk '{print $7}' | awk -F . '{print $1}'`
+    out=`expr $out \* 1024`
+fi
+
+echo "Traffic Stats | in=$in out=$out"

@@ -1,0 +1,42 @@
+#!/bin/sh
+
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
+STATE_DEPENDENT=4
+
+result="ok"
+exitstatus=$STATE_OK
+
+while test -n "$1"; do
+    case "$1" in
+        -h)
+            host=$2
+            shift
+            ;;
+        *)
+            echo "Unknown argument: $1"
+            print_usage
+            exit $STATE_UNKNOWN
+            ;;
+    esac
+    shift
+done
+
+stats=`mysql -h $host -udev -pdev -e "show global status where Variable_name  in ('Qcache_hits', 'Com_select', 'Com_insert', 'Com_delete', 'Com_update', 'Connections', 'queries', 'Bytes_received', 'Bytes_sent');"`
+Bytes_received=`echo $stats | awk '{print $4}'`
+Bytes_received_h=`expr $Bytes_received / 1048576`
+Bytes_sent=`echo $stats | awk '{print $6}'`
+Bytes_sent_h=`expr $Bytes_sent / 1048576`
+Com_delete=`echo $stats | awk '{print $8}'`
+Com_insert=`echo $stats | awk '{print $10}'`
+Com_select=`echo $stats | awk '{print $12}'`
+Com_update=`echo $stats | awk '{print $14}'`
+Connections=`echo $stats | awk '{print $16}'`
+Qcache_hits=`echo $stats | awk '{print $18}'`
+Queries=`echo $stats | awk '{print $20}'`
+#`expr $date - $filemod`
+
+echo "MySQL Stats | Connections=$Connections MBytes_received=$Bytes_received_h MBytes_sent=$Bytes_sent_h Com_delete=$Com_delete Com_insert=$Com_insert Com_select=$Com_select Com_update=$Com_update Qcache_hits=$Qcache_hits Queries=$Queries"
+

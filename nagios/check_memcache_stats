@@ -1,0 +1,37 @@
+#!/bin/sh
+
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
+STATE_DEPENDENT=4
+
+exitstatus=$STATE_OK
+
+while test -n "$1"; do
+    case "$1" in
+        -h)
+            host=$2
+            shift
+            ;;
+        *)
+            echo "Unknown argument: $1"
+            print_usage
+            exit $STATE_UNKNOWN
+            ;;
+    esac
+    shift
+done
+
+bytes=`/usr/local/bin/memcached-tool $host:11211 stats | grep " bytes " | awk '{print $2}' | sed 's/.$//'`
+curr_connections=`/usr/local/bin/memcached-tool $host:11211 stats | grep curr_connections | awk '{print $2}' | sed 's/.$//'`
+curr_items=`/usr/local/bin/memcached-tool $host:11211 stats | grep curr_items | awk '{print $2}' | sed 's/.$//'`
+cmd_get=`/usr/local/bin/memcached-tool $host:11211 stats | grep cmd_get | awk '{print $2}' | sed 's/.$//'`
+cmd_set=`/usr/local/bin/memcached-tool $host:11211 stats | grep cmd_set | awk '{print $2}' | sed 's/.$//'`
+get_hits=`/usr/local/bin/memcached-tool $host:11211 stats | grep get_hits | awk '{print $2}' | sed 's/.$//'`
+
+echo "Memcache Stats | bytes=$bytes curr_connections=$curr_connections curr_items=$curr_items cmd_get=$cmd_get cmd_set=$cmd_set get_hits=$get_hits"
+
+#if [ $get_hits -gt $cmd_get ]; then
+#    echo "AHTUNG!!! Hits more then Gets (GET=$cmd_get HIT=$get_hits)" | mail -s "Memcache ERROR on $host!!!" skipper@prontosoft.by aludinovskov@prontosoft.by imatsiuk@prontosoft.by
+#fi

@@ -1,0 +1,136 @@
+#!/usr/local/bin/bash
+
+#		copy server.conf.php to all servers
+#       run it script from mephius user
+#		from helper server
+#		file server.conf.php must have owner mephius
+
+op=$1
+now=`date "+%Y-%m-%d_%H:%M:%S"`
+conf_path_www='/usr/local/www/new.irr.ru/'
+conf_path_home='/usr/home/mephius/irr.ru/'
+conf_path_home_debian='/home/mephius/irr.ru/'
+conf_path_home_kz='/usr/home/mephius/irr.kz/'
+
+copy_config ()
+{
+	server_ip=$1
+	port=$2
+	conf_path=$3
+	server_name=$4
+	res=1       # error
+	echo -e "\n\033[1m\033[33m\t$server_name\033[0m"
+	echo "create backup server.conf.php_$now in home dir on $server_ip"
+#	/usr/bin/ssh -p $port mephius@$server_ip "sudo cp ${conf_path}config/server.conf.php ~/server.conf.php_$now"
+#	if [ $? -eq 0 ]; then
+		echo "replace server.conf.php on $server_ip"
+#		/usr/bin/scp -q -P $port -i /home/mephius/.ssh/id_rsa configs/server.conf.php mephius@$server_ip:${conf_path}config/server.conf.php
+		if [ $? -eq 0 ]; then
+			res=0
+			echo -e "\033[1m\033[34mfile replaced [OK]\033[0m"
+		else
+			echo -e "\033[1m\033[35m\033[5mfile not replaced [BAD]\033[0m"
+		fi
+#	fi
+#	echo ""     # \n
+#	return $res
+
+	echo "create backup ru production.conf.php_$now in home dir on $server_ip"
+#	/usr/bin/ssh -p $port mephius@$server_ip "sudo cp ${conf_path}config/ru/production.conf.php ~/ru_production.conf.php_$now"
+#	if [ $? -eq 0 ]; then
+		echo "replace rc.conf on $server_ip"
+#		/usr/bin/scp -q -P $port -i /home/mephius/.ssh/id_rsa configs/ru/production.conf.php mephius@$server_ip:${conf_path}config/ru/production.conf.php
+		if [ $? -eq 0 ]; then
+			res=0
+			echo -e "\033[1m\033[34mfile replaced [OK]\033[0m"
+		else
+			echo -e "\033[1m\033[35m\033[5mfile not replaced [BAD]\033[0m"
+		fi
+#	fi
+#	echo ""     # \n
+#	return $res
+	
+	echo "create backup kz production.conf.php_$now in home dir on $server_ip"
+#	/usr/bin/ssh -p $port mephius@$server_ip "sudo cp ${conf_path}config/kz/production.conf.php ~/kz_production.conf.php_$now"
+#	if [ $? -eq 0 ]; then
+		echo "replace rc.conf.kz on $server_ip"
+#		/usr/bin/scp -q -P $port -i /home/mephius/.ssh/id_rsa configs/kz/production.conf.php mephius@$server_ip:${conf_path}config/kz/production.conf.php
+		if [ $? -eq 0 ]; then
+			res=0
+			echo -e "\033[1m\033[34mfile replaced [OK]\033[0m"
+		else
+			echo -e "\033[1m\033[35m\033[5mfile not replaced [BAD]\033[0m"
+		fi
+#	fi
+#	echo ""     # \n
+	return $res
+}
+
+case $op in
+
+    "--copy")
+
+	MESSAGE= /usr/local/bin/php -l /home/mephius/configs/rc.conf.new.php/configs/server.conf.php
+	if [ $? -ne 0 ]
+		then
+			echo "Server.conf error:  $MESSAGE" 1>&2
+			exit 1
+	fi
+	echo "$MESSAGE" 1>&2
+	MESSAGE= /usr/local/bin/php -l /home/mephius/configs/rc.conf.new.php/configs/ru/production.conf.php
+	if [ $? -ne 0 ]
+		then
+			echo "Production.conf error: $MESSAGE" 1>&2
+			exit 1
+	fi
+	echo "$MESSAGE" 1>&2
+
+	index=1
+	declare -a servers
+	servers[11]="192.168.1.1"; servers[12]="web1"; servers[13]="$conf_path_www"
+	servers[21]="192.168.1.2"; servers[22]="web2"; servers[23]="$conf_path_www"
+	servers[31]="192.168.1.3"; servers[32]="web3"; servers[33]="$conf_path_www"
+	servers[41]="192.168.1.184"; servers[42]="web4"; servers[43]="$conf_path_www"
+	servers[51]="192.168.1.12"; servers[52]="web5"; servers[53]="$conf_path_www"
+	servers[61]="192.168.1.13"; servers[62]="web6"; servers[63]="$conf_path_www"
+	servers[71]="192.168.1.71"; servers[72]="web7"; servers[73]="$conf_path_www"
+	servers[81]="192.168.1.72"; servers[82]="web8"; servers[83]="$conf_path_www"
+	servers[91]="192.168.1.14"; servers[92]="web9"; servers[93]="$conf_path_www"
+	servers[101]="192.168.1.182"; servers[102]="web10"; servers[103]="$conf_path_www"
+	servers[111]="192.168.1.53"; servers[112]="web11"; servers[113]="$conf_path_www"
+	servers[121]="192.168.1.78"; servers[122]="web12"; servers[123]="$conf_path_www"
+	servers[131]=""; servers[132]=""; servers[133]=""
+	servers[141]="192.168.1.107"; servers[142]="web14"; servers[143]="$conf_path_www"
+	servers[151]="192.168.1.183"; servers[152]="web15"; servers[153]="$conf_path_www"
+	servers[161]="192.168.1.108"; servers[162]="web16"; servers[163]="$conf_path_www"
+	servers[171]="192.168.1.179"; servers[172]="web17"; servers[173]="$conf_path_www"
+	servers[181]="192.168.1.178"; servers[182]="web18"; servers[183]="$conf_path_www"
+	servers[191]="192.168.1.177"; servers[192]="web19"; servers[193]="$conf_path_www"
+	servers[201]="192.168.1.176"; servers[202]="web20"; servers[203]="$conf_path_www"
+	servers[211]="192.168.1.164"; servers[212]="webbo"; servers[213]="$conf_path_www"
+	servers[221]="192.168.1.7"; servers[222]="helper2"; servers[223]="$conf_path_home"
+	servers[231]="192.168.1.7"; servers[232]="helper2_kz"; servers[233]="$conf_path_home_kz"
+	servers[241]="192.168.1.52"; servers[242]="helper3"; servers[243]="$conf_path_home"
+	servers[251]="192.168.1.11"; servers[252]="cruncher"; servers[253]="$conf_path_home"
+	servers[261]="192.168.1.8"; servers[262]="helper"; servers[263]="$conf_path_home"
+	servers_count=$[${#servers[@]} / 3]
+	while [ $index -le $servers_count ]; do
+	    if [ ! -z ${servers[${index}1]} ]; then
+		copy_config ${servers[${index}1]} 22 ${servers[${index}3]} ${servers[${index}2]}.irr.ru > /var/tmp/${servers[${index}2]}.log && cat /var/tmp/${servers[${index}2]}.log &
+		let "index+=1"
+	    else
+		let "index+=1"
+	    fi
+	done
+	;;
+
+    "--help")
+    	echo "--copy";
+    	printf "\tcopy config files to servers";
+    	;;
+
+    *)
+        echo "Unknown parameter. See --help"
+        ;;
+
+esac

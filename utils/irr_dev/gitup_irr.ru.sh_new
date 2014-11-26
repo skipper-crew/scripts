@@ -1,0 +1,79 @@
+#!/usr/local/bin/bash
+
+site_path='/usr/local/www/new.irr.ru'
+helper_path='/home/mephius/irr.ru'
+helper_path_kz='/home/mephius/irr.kz'
+helper_path_tmp='/home/mephius/irr.ru.tmp'
+
+update_web ()
+{
+    ip=$1; hostname=$2; dir=$3
+    /usr/bin/ssh mephius@$ip -p22 "echo -e \"\n\033[1m\033[33m\t$hostname\033[0m\" > /var/tmp/update.status; cd $site_path; pwd >> /var/tmp/update.status; sudo /usr/local/etc/rc.d/php-fpm restart >> /var/tmp/update.status; cat /var/tmp/update.status" & echo $! > /var/run/update_$hostname.pid
+}
+update_helper ()
+{
+    ip=$1; hostname=$2; dir=$3
+    /usr/bin/ssh mephius@$ip -p22 "echo -e \"\n\033[1m\033[33m\t$hostname\033[0m\" > /var/tmp/update.status.$hostname; cd $helper_path; pwd >> /var/tmp/update.status.$hostname; cat /var/tmp/update.status.$hostname" & echo $! > /var/run/update_$hostname.pid
+}
+update_local ()
+{
+    ip=$1; hostname=$2; dir=$3
+    echo -e "\n\033[1m\033[33m\t$hostname\033[0m" > /var/tmp/update.status.$hostname; cd $helper_path; sudo -u mephius pwd >> /var/tmp/update.status.$hostname; cat /var/tmp/update.status.$hostname & echo $! > /var/run/update_$hostname.pid
+}
+
+op=$1
+case $op in
+
+    "--update")
+	update_web	'192.168.1.1'	web1.irr.ru $site_path
+	update_web	'192.168.1.2'	web2.irr.ru $site_path
+	update_web	'192.168.1.3'	web3.irr.ru $site_path
+	update_web	'192.168.1.184'	web4.irr.ru $site_path
+	update_web	'192.168.1.12'	web5.irr.ru $site_path
+	update_web	'192.168.1.13'	web6.irr.ru $site_path
+	update_web	'192.168.1.71'	web7.irr.ru $site_path
+	update_web	'192.168.1.72'	web8.irr.ru $site_path
+	update_web	'192.168.1.14'	web9.irr.ru $site_path
+	update_web	'192.168.1.182'	web10.irr.ru $site_path
+	update_web	'192.168.1.53'	web11.irr.ru $site_path
+	update_web	'192.168.1.78'	web12.irr.ru $site_path
+#	update_web	'192.168.1.1'	web13.irr.ru $site_path
+	update_web	'192.168.1.107'	web14.irr.ru $site_path
+	update_web	'192.168.1.183'	web15.irr.ru $site_path
+	update_web	'192.168.1.108'	web16.irr.ru $site_path
+	update_web	'192.168.1.179'	web17.irr.ru $site_path
+	update_web	'192.168.1.178'	web18.irr.ru $site_path
+	update_web	'192.168.1.177'	web19.irr.ru $site_path
+	update_web	'192.168.1.176'	web20.irr.ru $site_path
+	update_web	'192.168.1.164'	webbo.irr.ru $site_path
+	update_helper	'192.168.1.7'	helper2.irr.ru $helper_path
+	update_helper	'192.168.1.7'	helper2_kz.irr.ru $helper_path
+	update_helper	'192.168.1.52'	helper3.irr.ru $helper_path
+	update_helper	'192.168.1.11'	cruncher.irr.ru $helper_path
+	update_local	'192.168.1.8'	helper.irr.ru $helper_path
+	update_local	'192.168.1.8'	helper_tmp.irr.ru $helper_path
+
+	# Check Update Status
+	index=0
+	declare -a servers
+	servers=(web1 web2 web3 web4 web5 web6 web7 web8 web9 web10 web11 web12 web13 web14 web15 web16 web17 web18 web19 web20 helper helper_tmp helper2 helper2_kz helper3 cruncher)
+	while [ $index -lt ${#servers[@]} ]; do
+	    web_pid=`cat /var/run/update_${servers[$index]}.irr.ru.pid`; web_ps_pid=`ps aux | grep $web_pid | grep -v grep | awk '{print $2}'`
+	    echo -e "\033[1m\033[34m\tChecking status on ${servers[$index]}\033[0m"
+	    if [ ! -z $web_ps_pid ]; then
+		echo -e "\033[1m\033[34m\tUpdate still in progress...\033[0m"
+	    else
+		let "index+=1"
+	    fi
+	    sleep 1
+	done
+	echo -e "\033[1m\033[35m\033[5m\tUpdate complite!!!\033[0m"
+	;;
+    "--help")
+	echo "--copy";
+	printf "\tcopy config files to servers";
+	;;
+    *)
+	echo "Unknown parameter. See --help"
+	;;
+esac
