@@ -1,0 +1,115 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="/monitoring/monitoring.css" />
+</head>
+<title><?=$title?></title>
+<center>
+<h3 style="color: white">IRR.RU</h2>
+</center>
+<center style="color: red; font-weight: bold">
+<a href="/monitoring">IRR.RU</a> | <a href="/monitoring/la_t">TRUCKLIST.RU</a> | <a href="/monitoring/redis_kz">IRR.KZ</a> | <a href="/monitoring/release">RELEASE</a>
+</center>
+<br />
+<body>
+<?
+$items=array(
+    'Daily graphs'=>'?scope=d',
+    'Weekly graphs'=>'?scope=w',
+    'Monthly graphs'=>'?scope=m',
+    'Yearly graphs'=>'?scope=y',
+);
+
+$scopes=array(
+    'd'=>'_1d',
+    'w'=>'_1w',
+    'm'=>'_1m',
+    'y'=>'_1y',
+);
+
+if(isset($_GET['scope']) && isset($scopes[$_GET['scope']])){
+    $scope = $scopes[$_GET['scope']];
+}else{
+    $scope = '_1d';
+}
+?>
+<center style="color: red; font-weight: bold">
+<?
+
+$areas=array(
+//    'cpu'=>'CPU stats',
+    'cpu2'=>'CPU stats',
+//    'reqtimes'=>'Request times',
+//    'traffic'=>'External traffic',
+    'traffic2'=>'External traffic',
+//    'la'=>'Load Averages',
+    'la2'=>'Load Averages',
+//    'nginx'=>'Nginx stats',
+    'nginx2'=>'Nginx stats',
+//    'mysql'=>'MySQL stats',
+    'mysql2'=>'MySQL stats',
+    'redis'=>'Redis Stats',
+//    'cache'=>'Cache stats',
+    'cache2'=>'Cache stats',
+//    'search'=>'Search stats',
+    'sphinx2'=>'Search stats',
+    'pinba_page'=>'Pinba page stats',
+    'pinba_page_ssi'=>'Pinba page SSI stats',
+    'pinba_page_ssi_adlist'=>'Pinba page SSI adlist stats',
+    'pinba_page_memcache'=>'Pinba Memcache stats',
+    'pinba_page_redis'=>'Pinba Redis stats',
+//    'pinba'=>'Pinba stats',
+    'pinba2'=>'Pinba stats',
+//        'pinba2/index_new.php'=>'Pinba Old stats',
+//	'pinba/timers.php' =>'Pinba timers stats',
+	'pinba2/timers.php' =>'Pinba timers stats',
+//	'pinba/elastica.php' =>'Pinba Elastica stats',
+	'pinba2/elastica.php' =>'Pinba Elastica stats',
+	'pgsql' => 'PGSQL',
+//	'catalog' =>'Goods catalog',
+	'catalog2' =>'Goods catalog',
+//	'elastica' => 'Elastica stats',
+	'queues_stats' => 'Queues stats',
+//	'hdd' => 'HDD',
+//	'ram' => 'RAM Activity',
+//	'trucklist' => 'trucklist.ru',
+);
+
+$parts = explode('/', $_SERVER['REQUEST_URI']);
+if (isset($parts[3]) && isset($areas[$parts[2] . '/' . $parts[3]])) {
+	$active_area = $parts[2] . '/' . $parts[3];
+} else if(isset($parts[2]) && isset($areas[$parts[2]])){
+    $active_area = $parts[2];
+}else{
+    $active_area='cpu';
+}
+
+$buffer='';
+foreach(array_keys($areas) as $area){
+    if($area==$active_area){
+	$buffer.=($buffer!='' ? '&nbsp;|&nbsp;' : '') .  $areas[$area];
+    }else{
+	$buffer.=($buffer!='' ? '&nbsp;|&nbsp;' : '') .  '<a href="/monitoring/'.($area=='cpu' ? '' : $area ).'">'.$areas[$area].'</a>';
+    }
+}
+
+echo $buffer;
+
+?>
+</center>
+<br />
+<center class="links">
+<?
+$cnt=0;
+foreach($items as $title=>$link){
+    if($cnt>0) echo '&nbsp;|&nbsp;';
+    if($link=='?scope=' . str_replace('_1', '', $scope)){
+		echo '<span>' . $title . '</span>';
+    }else{
+        echo '<a href="'.$link.'">' . $title . '</a>';
+    }
+    $cnt++;
+}
+?>
+</center>
+<br />
