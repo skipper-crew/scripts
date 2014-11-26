@@ -1,0 +1,63 @@
+#!/bin/sh
+
+folder=$1
+op=$2
+pid_file_1="/var/run/img_cleaner_${folder}_thread-1.pid"
+pid_file_2="/var/run/img_cleaner_${folder}_thread-2.pid"
+pid_file_3="/var/run/img_cleaner_${folder}_thread-3.pid"
+pid_file_4="/var/run/img_cleaner_${folder}_thread-4.pid"
+
+if [ -z $folder ]
+    then
+    echo "Usage: ./img_cleaner [i2|i3] [start|stop]"
+    exit 0
+fi
+
+if [ $folder != "i2" ] && [ $folder != "i3" ]
+    then
+    echo "Usage: ./img_cleaner [i2|i3] [start|stop]"
+    exit 0
+fi
+
+start ()
+{
+    echo "IMG Clearner started"
+    /usr/home/script/img_clean/remove_unlinked_images_${folder}.sh $1
+}
+
+stop ()
+{
+    pid_file=$1
+    pid=`cat $pid_file`
+    kill -TERM $pid
+    rm $pid_file >> /dev/null
+    echo "IMG Clearner stoped"
+}
+
+case $op in
+
+    "start")
+	if [ -e $pid_file_1 ]; then
+	    echo "IMG Cleaner already running"
+	    exit 0
+	fi
+	start thread1 & echo $! > $pid_file_1
+	start thread2 & echo $! > $pid_file_2
+	start thread3 & echo $! > $pid_file_3
+	start thread4 & echo $! > $pid_file_4
+	;;
+    "stop")
+	if [ ! -e $pid_file_1 ]; then
+	    echo "IMG Cleaner not running"
+	    exit 0
+	fi
+	stop $pid_file_1
+	stop $pid_file_2
+	stop $pid_file_3
+	stop $pid_file_4
+	;;
+    *)
+	echo "Usage: ./img_cleaner [i2|i3] [start|stop]"
+	;;
+
+esac
