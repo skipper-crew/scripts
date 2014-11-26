@@ -1,0 +1,12 @@
+1.7	storage	3:00	6
+dd if=/dev/ad4 bs=8M conv=sync,noerror | gzip -c > /qnap/Servers/Storage/ad4.img
+1.8	dev-db	0:00	0-4
+dd if=/dev/sda bs=8M conv=sync,noerror | gzip -c > /qnap/Servers/devel-db/sda.img
+1.9	dev-web 0:00 	5	2:30	0-4
+dd if=/dev/ad6 bs=8M conv=sync,noerror | gzip -c > /qnap/Servers/devel-web/ad6.img
+dd if=/dev/ad8 bs=8M conv=sync,noerror | gzip -c > /qnap/Servers/devel-web/ad8.img
+1.10	java	5:00	0-4
+dd if=/dev/sda bs=8M conv=sync,noerror | gzip -c > /qnap/Servers/java/sda.img
+1.12	job-db	4:00	5	4:00	6
+dd if=/dev/sda bs=8M conv=sync,noerror | gzip -c > /qnap/Servers/job-db/sda.img
+dd if=/dev/sdb bs=8M conv=sync,noerror | gzip -c > /qnap/Servers/job-db/sdb.img

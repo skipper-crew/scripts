@@ -1,0 +1,1 @@
+gunzip -c /data/iso/ad8_old.img.gz | pv -c | dd bs=8M of=/dev/ad7

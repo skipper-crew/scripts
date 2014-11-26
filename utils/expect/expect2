@@ -1,0 +1,22 @@
+#!/usr/local/bin/expect -f
+set timeout 2
+set USER "mig"
+set PASS "55555"
+set HOST "192.168.1.223"
+set arg [lindex $argv 0]
+# Начало сценария
+spawn ssh $USER@$HOST;
+ 
+ expect {
+  
+  "(yes/no)?*" {
+  send "yes\r"
+   }
+   }
+   expect "word:"
+   send "$PASS\r"
+   expect "$*"
+   send "$arg\r"
+   expect "$*"
+   send "exit\r"
+   expect eof

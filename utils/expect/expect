@@ -1,0 +1,17 @@
+#!/usr/local/bin/expect -f
+
+set ip_serve "93.125.111.228"
+set login "skipper"
+set passwd "45ajpFsd"
+#command=’ifconfig -a’
+
+#log_user 0
+spawn telnet 93.125.111.228 22
+send "^]"
+#expect "%" {send "y\r"}
+#expect "login as:" {send "$login\r"}
+#expect "Password:" {send "$passwd\r"}
+#expect “root@ifreebsd #” {send “$command\r”}
+#log_user 1
+#send "xit\r"
+expect eof
