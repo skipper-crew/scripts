@@ -1,0 +1,18 @@
+#!/bin/bash
+
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
+STATE_DEPENDENT=4
+
+exitstatus=$STATE_OK
+state_shot="OK"
+state=`/usr/sbin/mpt-status -i 3 | grep vol_id | awk '{print $11}' | sed 's/\,//'`
+if [ $state != "OPTIMAL" ]; then
+    state_shot="CRITICAL"
+    exitstatus=$STATE_CRITICAL
+fi
+
+echo "$state_shot : `/usr/sbin/mpt-status -i 3 | head -n 1`"
+exit $exitstatus
