@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Nagios plugin for HP SmartArray RAID monitoring
+
+msg=`/usr/local/bin/sudo /usr/local/bin/cciss_vol_status -u $1`
+rc=$?
+echo $msg
+if [ $rc -eq 0 ]
+then
+  exit 0
+else
+  exit 2
+fi
